@@ -1,58 +1,159 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <math.h>
+#include <time.h>
 
-void random_area(int x[][100], int y[][100], int filas, int columnas, int celula);
-void imprime_areas(int x[][100], int filas, int columnas);
-void ciclo_vida(int x[][100], int y[][100], int filas, int columnas);
-void copy_paste(int x[][100], int y[][100], int filas, int columnas);
-void limpieza(int y[][100], int filas, int columnas);
-bool estabilizate(int x[][100], int y[][100], int filas, int columnas);
+//FILAS Y COLUMNAS TOTALES
+#define COLUMNAS 40
+#define FILAS 20
 
-int Poblacion(int x[][100], int filas, int columnas);
+//REPETICIONES TOTALES
+#define DuracionJUEGO 2000
 
-int main()
-{
-    int filas, columnas, celula;
-    int m[100][100], t[100][100];
+//MÍNIMO DE CÉLULAS VIVAS QUE RODEAN PARA QUE NO SE MUERA
+#define MINAguanta_celula 2
+//MÁXIMO DE CÉLULAS VIVAS QUE RODEAN PARA QUE NO SE MUERA
+#define MAXAguanta_celula 3
 
-    printf("Introduce el número de filas: ");
-    scanf(" %i",&filas);
-    printf("Introduce el número de columnas: ");
-    scanf(" %i", &columnas);
-    printf("Cuantas celulas desea?");
-    scanf("%i", &celula);
+//MÁXIMO DE CÉLULAS VIVAS QUE RODEAN HA UNA MUERTA PARA REVIVIRLA
+#define MINAguanta_celulaVive 2
+//MÁXIMO DE CÉLULAS VIVAS QUE RODEAN HA UNA MUERTA PARA REVIVIRLA
+#define MAXAguanta_celulaVive 3
 
-    random_area(m,t,filas,columnas,celula); //Generamos la matriz con las células (con las dimsensiones deseadas)
+//LUGAR
+char poblacion[FILAS][COLUMNAS];
 
-    printf("El area es: ");
-    imprime_areas(m,filas,columnas); //Imprimimos el área
+//REGLAS DEL JUEGO
+int vida[4] = {MINAguanta_celula,MAXAguanta_celula,MINAguanta_celulaVive,MAXAguanta_celulaVive};
 
-    printf("Presiona una tecla para comenzar");
-    getch(); //Esta función espera la respuesta del teclado
+//FUNCIONES EN EL JUEGO
+void vida_inicial();
+void poblacion_celular();
+void ver_vida();
+int revision_celular(int,int);
+void cicloCelular();
 
-    for(int i=1; 1; i++){
-        system("clear");
-        system("toilet -fpagga Celuvita");
 
-        ciclo_vida(m,t,filas,columnas); //En esta función se verá que células mueren o viven
-        imprime_areas(m,filas,columnas); //Imprime las nuevas células
-/*
-        if(estabilizate(m,t,filas,columnas)==1)
-            printf("No es estable");
-        else{
-            static int ciclo=i;
-            printf("Si es estable");
-        }
-        if(Poblacion(m,filas,columnas)==0)
-            printf("Poblacion: 0");
-        else
-            printf("Poblacion: %i",Poblacion());
-            copy_paste(m,t,filas,columnas); //actualiza la matriz original con la matriz temporal
-            limpieza(t,f,columnas); //vuelve a inicializar la matriz temporal con ceros
-            sleep(500);//espera dos segundos para que pase al siguiente ciclo
-        }
-*/
-    printf("¡Gracias por jugar a Celuvita!");
+void vida_inicial(){
+   int i,j;
+   for (i = 0; i < FILAS; i++){
+       for (j = 0; j < COLUMNAS; j++){
+           poblacion[i][j] = '_';
+       }
+   }
+}
 
+void poblacion_celular(){
+int fil,x,y;
+srand(time(NULL));
+
+//CREACIÓN ALEATORIA
+for (fil = 0; fil < COLUMNAS; ++fil){
+ y = rand()%COLUMNAS;
+ x = rand()%FILAS;
+ if(poblacion[x][y]=='_')
+  poblacion[x][y]='O';
+}
+}
+
+void ver_vida(){
+   int i,j;
+   for (i = 0; i < FILAS; i++){
+           printf("\n");
+       for (j = 0; j < COLUMNAS; j++){
+           printf("%c",poblacion[i][j] );
+       }
+   }
+   printf("\n");
+}
+
+//CONTADOR DE CÉLULAS
+int revision_celular(int posicionFILAS, int posicionCOLUMNAS){
+int celulillas_vecinas = 0;
+if(posicionFILAS-1 >= 0 && posicionCOLUMNAS-1 >= 0)
+ if(poblacion[posicionFILAS-1][posicionCOLUMNAS-1] == 'O')
+  celulillas_vecinas++;
+if(posicionFILAS-1 >= 0)
+ if(poblacion[posicionFILAS-1][posicionCOLUMNAS] == 'O')
+  celulillas_vecinas++;
+if(posicionFILAS-1 >= 0 && posicionCOLUMNAS+1 <= COLUMNAS-1)
+ if(poblacion[posicionFILAS-1][posicionCOLUMNAS+1] == 'O')
+  celulillas_vecinas++;
+if(posicionCOLUMNAS-1 >= 0)
+ if(poblacion[posicionFILAS][posicionCOLUMNAS-1] == 'O')
+  celulillas_vecinas++;
+if(posicionCOLUMNAS+1 <= COLUMNAS-1)
+ if(poblacion[posicionFILAS][posicionCOLUMNAS+1] == '0')
+  celulillas_vecinas++;
+if(posicionFILAS+1 <= FILAS-1 && posicionCOLUMNAS-1 >= 0)
+ if(poblacion[posicionFILAS+1][posicionCOLUMNAS-1] == 'O')
+  celulillas_vecinas++;
+if(posicionFILAS+1 <= FILAS-1)
+ if(poblacion[posicionFILAS+1][posicionCOLUMNAS] == 'O')
+  celulillas_vecinas++;
+if(posicionFILAS+1 <= FILAS-1 && posicionCOLUMNAS+1 <= COLUMNAS-1)
+ if(poblacion[posicionFILAS+1][posicionCOLUMNAS+1] == 'O')
+  celulillas_vecinas++;
+
+//DEVUELVE LOS celulillas_vecinas
+return celulillas_vecinas;
+}
+
+void cicloCelular(){
+int fil,col;
+int n_celulillas_vecinas;
+
+//PRINCIPAL CICLO DEL JUEGO
+for(fil = 0; fil < FILAS; fil++){
+ for(col = 0; col < COLUMNAS; col++){
+  n_celulillas_vecinas = revision_celular(fil,col);
+
+  //CONDICIONES PARA LA NO MUERTE DE LA CÉLULA
+  if(poblacion[fil][col] == '_'){
+   if(n_celulillas_vecinas == MINAguanta_celulaVive || n_celulillas_vecinas == MAXAguanta_celulaVive)
+    poblacion[fil][col] = 'O';
+   else
+    poblacion[fil][col] = '_';
+  }
+  else if(poblacion[fil][col] == 'O'){
+   if(n_celulillas_vecinas == MINAguanta_celula || n_celulillas_vecinas == MAXAguanta_celula)
+    poblacion[fil][col] = 'O';
+   else
+    poblacion[fil][col] = '_';
+  }
+ }
+}
+}
+
+//FUNCIÓN PRINCIPAL
+int main(){
+
+  int i=0;
+  int opcion;
+
+  printf("¡BIENVENIDO A CELUVITA!\n");
+  printf("Pulsa 1 para comenzar\n");
+  printf("Opción escogida: ");
+  scanf("%i", &opcion);
+
+  printf("ANTES DE COMENZAR EL JUEGO\n"
+         "Para parar el proceso, pulsa 0");
+
+  if (opcion == 1) {
+      vida_inicial();
+      poblacion_celular();
+
+      while(i < DuracionJUEGO){
+          ver_vida();
+          usleep(100000); //VELOCIDAD DE CAMBIOS EN LAS CÉLULAS
+          system("clear");
+          cicloCelular();
+          i++;
+      }
+  }else{
+    printf("¡GRACIAS POR JUGAR A ESTE JUEGO!\n");
     return EXIT_SUCCESS;
+  }
+
 }
