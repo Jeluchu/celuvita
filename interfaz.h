@@ -9,6 +9,7 @@ extern "C" {
 
 void inicio();
 void barra();
+void menu();
 void pintar(int matriz[M][N]);
 void poblacion_inicial(int matriz[M][N]);
 void rellena(int matriz[M][N]);

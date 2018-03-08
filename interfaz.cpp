@@ -8,8 +8,8 @@
 #include "interfaz.h"
 #include "global.h"
 
-#define CAR_LLENO "▒"
-#define CAR_VACIO "░"
+#define CAR_LLENO "██"
+#define CAR_VACIO "░░"
 
 #define ROJO "\x1B[1;31m"
 #define NORMAL "\x1B[0m"
@@ -45,13 +45,15 @@ void barra(){
 
 void inicio(){
 
+    system("setterm -cursor off"); // OCULTA EL CURSOR
+
     time_t tiempo = time(0);
     struct tm *tlocal = localtime(&tiempo);
 
     char output[128];
     strftime(output, 128, "%d/%m/%y a las %H:%M:%S", tlocal);
 
-    printf("\n");
+    system("clear");
     system("toilet --gay -fpagga CELUVITA\n\n");
     printf("\n");
     sleep(2);
@@ -59,12 +61,26 @@ void inicio(){
     printf("%s", getenv("USER"));
     printf("\n" NORMAL);
     sleep(1);
-    printf(VERDE "❱     CELUVITA v1.0 · Versión CONWAY 'ESTABLE'\n" NORMAL);
+    printf(VERDE "❱     CELUVITA v1.6 · Versión CONWAY 'ESTABLE'\n" NORMAL);
     sleep(1);
     printf(AZULETE "❱     Iniciada el %s\n" NORMAL,output);
     sleep(3);
 
     barra();
+}
+
+void menu(){
+
+        printf(
+        "+---------------------------------------------------------------------+\n"
+        "|"      VERDE "\t\t¿Qué operación deseas realizar?" NORMAL     "\t\t\t      |\n"
+        "+---------------------------------------------------------------------+\n"
+        "|" NEGRITA "\t  Pulsa 1 " NORMAL "si quieres un juego automático" "\t\t\t      |\n"
+        "|" NEGRITA "\t  Pulsa 2 " NORMAL "para ver el juego detenidamente"   "\t\t\t      |\n"
+        "|" NEGRITA "\t  Pulsa 0 " NORMAL "si deseas salir" "\t\t\t\t      |\n"
+        "+---------------------------------------------------------------------+\n");
+
+
 }
 
 void pintar(int matriz[M][N]) {
@@ -76,8 +92,8 @@ void pintar(int matriz[M][N]) {
 }
 
 void dame_coord(int *x, int *y) {
-        printf("Usa unas coordenadas invalidas para terminar\n");
-        printf("\n\n\tNuevo x,y: ");
+        printf(ROJO "\tPara terminar, introduce coordenadas invalidas\n" NORMAL);
+        printf("\n\n\tIntroduce tus cordenadas (x,y): ");
         scanf(" %i, %i", x, y);
         --*x, --*y;
 }

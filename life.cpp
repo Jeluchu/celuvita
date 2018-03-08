@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <strings.h>
 #include <unistd.h>
 #include <time.h>
@@ -41,19 +42,28 @@ void calcular(int futuro[M][N], int actual[M][N])
 
 int main(){
 
-    int mundo[TIEMPOS][M][N];
-    int (*actual)[M][N] = &mundo[ACTUAL];
-    int (*futuro)[M][N] = &mundo[FUTURO];
-    int (*aux)[M][N];
+  int mundo[TIEMPOS][M][N];
+  int (*actual)[M][N] = &mundo[ACTUAL];
+  int (*futuro)[M][N] = &mundo[FUTURO];
+  int (*aux)[M][N];
+  int opmenu;
+  
 
-    inicio();
-    srand(time(NULL));
-    bzero(mundo[ACTUAL], sizeof(mundo[ACTUAL]));
-    rellena(*actual);
-    poblacion_inicial(mundo[ACTUAL]);
+  inicio();
+  srand(time(NULL));
+  bzero(mundo[ACTUAL], sizeof(mundo[ACTUAL]));
 
+  system("clear");
+  menu();
+  printf("Escoge la opción deseada: ");
+  scanf(" %i", &opmenu);
 
-    while(1) {
+  rellena(*actual);
+  poblacion_inicial(mundo[ACTUAL]);
+
+  switch(opmenu){
+   case 1:
+       while(1) {
         system("clear");
         calcular(*futuro, *actual);
         aux = actual;
@@ -61,7 +71,31 @@ int main(){
         futuro = aux;
         pintar(mundo[ACTUAL]);
         usleep(100000);
-    }
+       }
+   break;
 
-    return EXIT_SUCCESS;
+   case 2:
+       while(1) {
+        system("clear");
+        calcular(*futuro, *actual);
+        aux = actual;
+        actual = futuro;
+        futuro = aux;
+        pintar(mundo[ACTUAL]);
+        usleep(100000);
+	printf("Pulsa 2 veces 'ENTER' para continuar");
+	while(getchar()!='\n');	
+       }
+
+   break;
+
+   case 0:
+	return EXIT_SUCCESS;
+   break;
+
+   default: printf("Introduce una opción correcta\n");
+
+  }
+
+
 }
